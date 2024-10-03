@@ -49,4 +49,7 @@ junit.xml
 /cdk.out/
 .cdk.staging/
 .parcel-cache/
+.env
+.cdk.out.json
+cdk.context.json
 !/.projenrc.ts

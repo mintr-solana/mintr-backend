@@ -129,7 +129,7 @@
       "description": "Install project dependencies and update lockfile (non-frozen)",
       "steps": [
         {
-          "exec": "yarn install --check-files"
+          "exec": "npm install"
         }
       ]
     },
@@ -138,7 +138,7 @@
       "description": "Install project dependencies using frozen lockfile",
       "steps": [
         {
-          "exec": "yarn install --check-files --frozen-lockfile"
+          "exec": "npm ci"
         }
       ]
     },
@@ -211,13 +211,13 @@
       },
       "steps": [
         {
-          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/jest,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,jest,projen,ts-jest,ts-node,typescript"
+          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/aws-lambda,@types/http-errors,@types/jest,@types/node,dotenv,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,jest,projen,ts-jest,ts-node,typescript,@aws-lambda-powertools/logger,@aws-sdk/client-dynamodb,@aws-sdk/util-dynamodb,@middy/core,@middy/error-logger,@middy/http-error-handler,@middy/http-header-normalizer,@middy/http-router,@middy/http-security-headers,@solana/actions,@solana/actions-spec,@solana/web3.js,aws-lambda,http-errors"
         },
         {
-          "exec": "yarn install --check-files"
+          "exec": "npm install"
         },
         {
-          "exec": "yarn upgrade @types/jest @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen ts-jest ts-node typescript aws-cdk-lib constructs"
+          "exec": "npm update @types/aws-lambda @types/http-errors @types/jest @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk dotenv esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen ts-jest ts-node typescript @aws-lambda-powertools/logger @aws-sdk/client-dynamodb @aws-sdk/util-dynamodb @middy/core @middy/error-logger @middy/http-error-handler @middy/http-header-normalizer @middy/http-router @middy/http-security-headers @solana/actions @solana/actions-spec @solana/web3.js aws-cdk-lib aws-lambda constructs http-errors"
         },
         {
           "exec": "npx projen"

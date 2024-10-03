@@ -1,23 +1,45 @@
-import { App, Stack, StackProps } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import { App, Environment } from 'aws-cdk-lib'
+import { configDotenv } from 'dotenv'
+import { ActionsStack } from './stacks/ActionsStack'
+import { CertificateStack } from './stacks/CertificateStack'
+import { DatabaseStack } from './stacks/DatabaseStack'
+import { getMandatoryEnv } from './utils/getMandatoryEnv'
 
-export class MyStack extends Stack {
-  constructor(scope: Construct, id: string, props: StackProps = {}) {
-    super(scope, id, props);
+configDotenv()
 
-    // define resources here...
-  }
+const config = {
+  account: getMandatoryEnv('CDK_ACCOUNT'),
+  region: getMandatoryEnv('CDK_REGION'),
+  domain: getMandatoryEnv('DOMAIN'),
 }
 
-// for development, use account/region from cdk cli
-const devEnv = {
-  account: process.env.CDK_DEFAULT_ACCOUNT,
-  region: process.env.CDK_DEFAULT_REGION,
-};
+const app = new App()
+const env: Environment = {
+  account: config.account,
+  region: config.region,
+}
 
-const app = new App();
+const keyDatabase = new DatabaseStack(app, 'KeyData', {
+  tableName: 'mintr.keys',
+  env,
+})
 
-new MyStack(app, 'mintr-backend-dev', { env: devEnv });
-// new MyStack(app, 'mintr-backend-prod', { env: prodEnv });
+const certificateStack = new CertificateStack(app, 'CertificateStack', {
+  domain: config.domain,
+  env: {
+    account: env.account,
+    region: 'us-east-1',
+  },
+  crossRegionReferences: true,
+})
 
-app.synth();
+const actionsStack = new ActionsStack(app, 'ActionsStack', {
+  domain: config.domain,
+  cname: 'actions',
+  certificateArn: certificateStack.certificate.certificateArn,
+  crossRegionReferences: true,
+  env,
+})
+actionsStack.addDependency(keyDatabase)
+
+app.synth()

@@ -6,7 +6,7 @@
     "clobber": "npx projen clobber",
     "compile": "npx projen compile",
     "default": "npx projen default",
-    "deploy": "npx projen deploy",
+    "deploy": "./scripts/deploy.sh",
     "destroy": "npx projen destroy",
     "diff": "npx projen diff",
     "eject": "npx projen eject",
@@ -24,11 +24,14 @@
     "projen": "npx projen"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/http-errors": "^2.0.4",
     "@types/jest": "^29.5.13",
     "@types/node": "^18",
     "@typescript-eslint/eslint-plugin": "^7",
     "@typescript-eslint/parser": "^7",
-    "aws-cdk": "^2.1.0",
+    "aws-cdk": "^2.160.0",
+    "dotenv": "^16.4.5",
     "esbuild": "^0.24.0",
     "eslint": "^8",
     "eslint-import-resolver-typescript": "^3.6.3",
@@ -41,8 +44,23 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.1.0",
-    "constructs": "^10.0.5"
+    "@aws-lambda-powertools/logger": "^2.8.0",
+    "@aws-sdk/client-dynamodb": "^3.662.0",
+    "@aws-sdk/util-dynamodb": "^3.662.0",
+    "@middy/core": "^5.5.0",
+    "@middy/error-logger": "^5.5.0",
+    "@middy/http-error-handler": "^5.5.0",
+    "@middy/http-header-normalizer": "^5.5.0",
+    "@middy/http-router": "^5.5.0",
+    "@middy/http-security-headers": "^5.5.0",
+    "@solana/actions": "^1.6.5",
+    "@solana/actions-spec": "^2.4.1",
+    "@solana/web3.js": "^1.95.3",
+    "aws-cdk-lib": "^2.160.0",
+    "aws-lambda": "^1.0.7",
+    "constructs": "^10.0.5",
+    "esbuild": "^0.24.0",
+    "http-errors": "^2.0.0"
   },
   "license": "Apache-2.0",
   "publishConfig": {
@@ -52,8 +70,10 @@
   "jest": {
     "coverageProvider": "v8",
     "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.ts?(x)",
-      "<rootDir>/@(test|src)/**/*(*.)@(spec|test).ts?(x)"
+      "<rootDir>/@(src|test)/**/*(*.)@(spec|test).ts?(x)",
+      "<rootDir>/@(src|test)/**/__tests__/**/*.ts?(x)",
+      "<rootDir>/@(projenrc)/**/*(*.)@(spec|test).ts?(x)",
+      "<rootDir>/@(projenrc)/**/__tests__/**/*.ts?(x)"
     ],
     "clearMocks": true,
     "collectCoverage": true,

@@ -1,12 +1,19 @@
 {
   "dependencies": [
     {
+      "name": "@types/aws-lambda",
+      "type": "build"
+    },
+    {
+      "name": "@types/http-errors",
+      "type": "build"
+    },
+    {
       "name": "@types/jest",
       "type": "build"
     },
     {
       "name": "@types/node",
-      "version": "^18",
       "type": "build"
     },
     {
@@ -21,7 +28,11 @@
     },
     {
       "name": "aws-cdk",
-      "version": "^2.1.0",
+      "version": "^2.160.0",
+      "type": "build"
+    },
+    {
+      "name": "dotenv",
       "type": "build"
     },
     {
@@ -67,13 +78,73 @@
       "type": "build"
     },
     {
+      "name": "@aws-lambda-powertools/logger",
+      "type": "runtime"
+    },
+    {
+      "name": "@aws-sdk/client-dynamodb",
+      "type": "runtime"
+    },
+    {
+      "name": "@aws-sdk/util-dynamodb",
+      "type": "runtime"
+    },
+    {
+      "name": "@middy/core",
+      "type": "runtime"
+    },
+    {
+      "name": "@middy/error-logger",
+      "type": "runtime"
+    },
+    {
+      "name": "@middy/http-error-handler",
+      "type": "runtime"
+    },
+    {
+      "name": "@middy/http-header-normalizer",
+      "type": "runtime"
+    },
+    {
+      "name": "@middy/http-router",
+      "type": "runtime"
+    },
+    {
+      "name": "@middy/http-security-headers",
+      "type": "runtime"
+    },
+    {
+      "name": "@solana/actions",
+      "type": "runtime"
+    },
+    {
+      "name": "@solana/actions-spec",
+      "type": "runtime"
+    },
+    {
+      "name": "@solana/web3.js",
+      "type": "runtime"
+    },
+    {
       "name": "aws-cdk-lib",
-      "version": "^2.1.0",
+      "version": "^2.160.0",
+      "type": "runtime"
+    },
+    {
+      "name": "aws-lambda",
       "type": "runtime"
     },
     {
       "name": "constructs",
       "version": "^10.0.5",
+      "type": "runtime"
+    },
+    {
+      "name": "esbuild",
+      "type": "runtime"
+    },
+    {
+      "name": "http-errors",
       "type": "runtime"
     }
   ],
