@@ -28,7 +28,7 @@ export class ActionService {
   getOneOfActionDefinition = (): ActionGetResponse => ({
     description: 'Create a NFT collection',
     title: 'NFT collection creation',
-    icon: 'https://mintr.click/create-one-ob-banner.webp',
+    icon: 'https://mintr.click/create-one-of-banner.webp',
     label: 'Create a NFT collection',
     links: {
       actions: [
