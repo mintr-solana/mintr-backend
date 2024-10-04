@@ -90,6 +90,22 @@
       "type": "runtime"
     },
     {
+      "name": "@metaplex-foundation/mpl-core",
+      "type": "runtime"
+    },
+    {
+      "name": "@metaplex-foundation/umi",
+      "type": "runtime"
+    },
+    {
+      "name": "@metaplex-foundation/umi-bundle-defaults",
+      "type": "runtime"
+    },
+    {
+      "name": "@metaplex-foundation/umi-web3js-adapters",
+      "type": "runtime"
+    },
+    {
       "name": "@middy/core",
       "type": "runtime"
     },

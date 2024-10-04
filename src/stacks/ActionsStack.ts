@@ -27,6 +27,7 @@ export interface ActionsStackProps extends StackProps {
   domain: string;
   cname: string;
   certificateArn: string;
+  solanaRpcNode: string;
 }
 
 export class ActionsStack extends Stack {
@@ -37,6 +38,7 @@ export class ActionsStack extends Stack {
       certificateArn,
       domain,
       cname,
+      solanaRpcNode,
     } = props
 
     const domainName = `${cname}.${domain}`
@@ -59,6 +61,7 @@ export class ActionsStack extends Stack {
       logRetention: RetentionDays.TWO_WEEKS,
       environment: {
         TABLE_NAME: table.tableName,
+        SOLANA_RPC_NODE: solanaRpcNode,
       },
       handler: 'handler',
       bundling: {

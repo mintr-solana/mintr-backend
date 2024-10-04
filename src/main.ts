@@ -11,6 +11,7 @@ const config = {
   account: getMandatoryEnv('CDK_ACCOUNT'),
   region: getMandatoryEnv('CDK_REGION'),
   domain: getMandatoryEnv('DOMAIN'),
+  solanaRpcNode: getMandatoryEnv('SOLANA_RPC_NODE'),
 }
 
 const app = new App()
@@ -38,6 +39,7 @@ const actionsStack = new ActionsStack(app, 'ActionsStack', {
   cname: 'actions',
   certificateArn: certificateStack.certificate.certificateArn,
   crossRegionReferences: true,
+  solanaRpcNode: config.solanaRpcNode,
   env,
 })
 actionsStack.addDependency(keyDatabase)

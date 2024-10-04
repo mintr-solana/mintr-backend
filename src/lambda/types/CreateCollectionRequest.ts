@@ -3,4 +3,5 @@ export type CreateCollectionRequest = {
   supply: number;
   price: number;
   url: string;
+  account: string;
 }

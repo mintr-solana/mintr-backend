@@ -58,8 +58,22 @@ const routes: Route<APIGatewayProxyEventV2, APIGatewayProxyResultV2>[] = [
         if (supply < 1 || supply.toFixed(0) !== supplyString) {
           return badRequest('supply is invalid')
         }
-        await actionService.createCollection({ name, url, price, supply })
-        return ok('success')
+        const body = event.body
+        if (!body) {
+          return badRequest('body is missing')
+        }
+        const bodyParsed = JSON.parse(body)
+        if (!bodyParsed.account) {
+          return badRequest('account is missing')
+        }
+        const collectionResponse = await actionService.createCollection({
+          name,
+          url,
+          price,
+          supply,
+          account: bodyParsed.account,
+        })
+        return ok(collectionResponse)
       }),
   },
   {
