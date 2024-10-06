@@ -34,7 +34,7 @@ export class ActionService {
   getOneOfActionDefinition = (): ActionGetResponse => ({
     description: 'Create a NFT',
     title: 'NFT creation',
-    icon: 'https://assets.mintr.click/icon.png',
+    icon: 'https://assets.mintr.click/logo.svg',
     label: 'Create a NFT',
     links: {
       actions: [
