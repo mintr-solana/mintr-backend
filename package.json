@@ -46,8 +46,10 @@
   "dependencies": {
     "@aws-lambda-powertools/logger": "^2.8.0",
     "@aws-sdk/client-dynamodb": "^3.662.0",
+    "@aws-sdk/client-s3": "^3.665.0",
     "@aws-sdk/util-dynamodb": "^3.662.0",
     "@metaplex-foundation/mpl-core": "^1.1.1",
+    "@metaplex-foundation/mpl-token-metadata": "^3.2.1",
     "@metaplex-foundation/umi": "^0.9.2",
     "@metaplex-foundation/umi-bundle-defaults": "^0.9.2",
     "@metaplex-foundation/umi-web3js-adapters": "^0.9.2",

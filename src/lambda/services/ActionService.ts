@@ -1,49 +1,55 @@
 import { Logger } from '@aws-lambda-powertools/logger'
-import { createCollection, mplCore } from '@metaplex-foundation/mpl-core'
+import { mplCore } from '@metaplex-foundation/mpl-core'
+import { createNft, mplTokenMetadata } from '@metaplex-foundation/mpl-token-metadata'
 import {
   createNoopSigner,
   createSignerFromKeypair,
+  percentAmount,
   publicKey,
   signerIdentity,
   signerPayer,
+  signTransaction,
 } from '@metaplex-foundation/umi'
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
 import { toWeb3JsTransaction } from '@metaplex-foundation/umi-web3js-adapters'
 import { ActionPostResponse, createPostResponse } from '@solana/actions'
 import { ActionGetResponse } from '@solana/actions-spec'
 import { InternalServerError } from 'http-errors'
+import { FileService } from './FileService'
 import { KeyService } from './KeyService'
 import { getMandatoryEnv } from '../../utils/getMandatoryEnv'
-import { CreateCollectionRequest } from '../types/CreateCollectionRequest'
+import { CreateAssetRequest } from '../types/CreateAssetRequest'
 
 export class ActionService {
   private readonly logger = new Logger({ serviceName: 'ActionService' })
   private readonly keyService: KeyService
+  private readonly fileService: FileService
   private readonly solanaRpcNode = getMandatoryEnv('SOLANA_RPC_NODE')
 
-  constructor(keyService: KeyService) {
+  constructor(keyService: KeyService, fileService: FileService) {
     this.keyService = keyService
+    this.fileService = fileService
   }
 
   getOneOfActionDefinition = (): ActionGetResponse => ({
-    description: 'Create a NFT collection',
-    title: 'NFT collection creation',
-    icon: 'https://mintr.click/create-one-of-banner.webp',
-    label: 'Create a NFT collection',
+    description: 'Create a NFT',
+    title: 'NFT creation',
+    icon: 'https://assets.mintr.click/icon.png',
+    label: 'Create a NFT',
     links: {
       actions: [
         {
           type: 'message',
-          label: 'Create collection 🚀',
-          href: '/collections/create-one-of?price={price}&name={name}&url={url}&supply={supply}',
+          label: 'Create NFT 🚀',
+          href: '/collections/create-nft?name={name}&url={url}',
           parameters: [
             {
               name: 'name',
-              label: 'Collection name',
+              label: 'NFT name',
               required: true,
               type: 'text',
-              pattern: '[a-zA-Z0-9]{4-10}',
-              patternDescription: '4 to 10 letters or digits',
+              pattern: '[a-zA-Z0-9]{4-50}',
+              patternDescription: '4 to 50 letters or digits',
             },
             {
               name: 'url',
@@ -51,29 +57,15 @@ export class ActionService {
               required: true,
               type: 'url',
             },
-            {
-              name: 'supply',
-              label: 'Collection supply',
-              required: true,
-              type: 'number',
-              min: 1,
-            },
-            {
-              name: 'price',
-              label: 'Mint price',
-              required: true,
-              type: 'number',
-              min: 0,
-            },
           ],
         },
       ],
     },
   })
 
-  createCollection = async (request: CreateCollectionRequest): Promise<ActionPostResponse> => {
+  createAsset = async (request: CreateAssetRequest): Promise<ActionPostResponse> => {
     try {
-      this.logger.info('Create collection', { request })
+      this.logger.info('Create asset', { request })
       const umi = createUmi(this.solanaRpcNode).use(mplCore())
 
       const { privateKey, name } = await this.keyService.generateNewKey(request.name)
@@ -82,18 +74,35 @@ export class ActionService {
       const payer = createNoopSigner(publicKey(request.account))
       umi.use(signerIdentity(signer))
       umi.use(signerPayer(payer))
+      umi.use(mplTokenMetadata())
 
-      const collection = createCollection(umi, {
-        collection: signer,
+      const today = new Date()
+      const assetInfo = {
         name,
-        uri: request.url,
+        description: name,
+        image: request.url,
+      }
+      const assetInfoUrl = await this.fileService.saveJsonFile({
+        filename: `${request.account}/${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}/${encodeURIComponent(name)}.json`,
+        contentJson: assetInfo,
+      })
+
+      const asset = createNft(umi, {
+        mint: signer,
+        symbol: 'MINTR',
+        name,
+        sellerFeeBasisPoints: percentAmount(1),
+        uri: assetInfoUrl,
         payer: payer,
         updateAuthority: signer.publicKey,
       })
-      this.logger.info('Created collection', { collection })
-      const transaction = await collection.buildWithLatestBlockhash(umi)
-      this.logger.info(`Created transaction ${transaction.serializedMessage}`, { message: transaction.message })
-      const solanaTransaction = toWeb3JsTransaction(transaction)
+      this.logger.info('Created asset', { asset })
+      const transaction = await asset.buildWithLatestBlockhash(umi)
+      const signedTransaction = await signTransaction(transaction, [signer])
+      const solanaTransaction = toWeb3JsTransaction(signedTransaction)
+      this.logger.info('Created transaction', {
+        transaction: solanaTransaction,
+      })
       return await createPostResponse({
         fields: {
           type: 'transaction',
@@ -101,8 +110,8 @@ export class ActionService {
         },
       })
     } catch (e) {
-      this.logger.error('Failed to create collection', { error: e })
-      throw InternalServerError('Failed to create the collection')
+      this.logger.error('Failed to create asset', { error: e })
+      throw InternalServerError('Failed to create the asset')
     }
   }
 }

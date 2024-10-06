@@ -23,11 +23,13 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     'aws-lambda',
     'esbuild',
     '@aws-sdk/client-dynamodb',
+    '@aws-sdk/client-s3',
     '@aws-sdk/util-dynamodb',
     '@metaplex-foundation/umi',
     '@metaplex-foundation/mpl-core',
     '@metaplex-foundation/umi-bundle-defaults',
     '@metaplex-foundation/umi-web3js-adapters',
+    '@metaplex-foundation/mpl-token-metadata',
   ],
   devDeps: [
     '@types/aws-lambda',

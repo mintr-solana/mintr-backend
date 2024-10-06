@@ -10,16 +10,18 @@ import { ActionService } from './services/ActionService'
 import { badRequest } from '../utils/badRequest'
 import { notFound } from '../utils/notFound'
 import { ok } from '../utils/ok'
+import { FileService } from './services/FileService'
 import { KeyService } from './services/KeyService'
 
 const logger: Logger = new Logger({ serviceName: 'api' })
 const keyService = new KeyService()
-const actionService = new ActionService(keyService)
+const fileService = new FileService()
+const actionService = new ActionService(keyService, fileService)
 
 const routes: Route<APIGatewayProxyEventV2, APIGatewayProxyResultV2>[] = [
   {
     method: 'GET',
-    path: '/collections/create-one-of',
+    path: '/collections/create-nft',
     handler: middy()
       .handler(async (): Promise<APIGatewayProxyResultV2> => {
         const definition = actionService.getOneOfActionDefinition()
@@ -31,32 +33,16 @@ const routes: Route<APIGatewayProxyEventV2, APIGatewayProxyResultV2>[] = [
   },
   {
     method: 'POST',
-    path: '/collections/create-one-of',
+    path: '/collections/create-nft',
     handler: middy()
       .handler(async (event) => {
         const name = event.queryStringParameters?.name
-        if (!name || name.length < 4 || name.length > 10) {
+        if (!name || name.length < 4 || name.length > 50) {
           return badRequest('name is missing or invalid')
         }
         const url = event.queryStringParameters?.url
         if (!url || url.length < 5) {
           return badRequest('url is missing or invalid')
-        }
-        const priceString = event.queryStringParameters?.price
-        if (!priceString) {
-          return badRequest('price is missing')
-        }
-        const price = Number(priceString)
-        if (price < 0 || isNaN(price)) {
-          return badRequest('price is invalid')
-        }
-        const supplyString = event.queryStringParameters?.supply
-        if (!supplyString) {
-          return badRequest('supply is missing')
-        }
-        const supply = Number(supplyString)
-        if (supply < 1 || supply.toFixed(0) !== supplyString) {
-          return badRequest('supply is invalid')
         }
         const body = event.body
         if (!body) {
@@ -66,11 +52,9 @@ const routes: Route<APIGatewayProxyEventV2, APIGatewayProxyResultV2>[] = [
         if (!bodyParsed.account) {
           return badRequest('account is missing')
         }
-        const collectionResponse = await actionService.createCollection({
+        const collectionResponse = await actionService.createAsset({
           name,
           url,
-          price,
-          supply,
           account: bodyParsed.account,
         })
         return ok(collectionResponse)

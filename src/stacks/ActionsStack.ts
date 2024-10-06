@@ -21,13 +21,16 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { RetentionDays } from 'aws-cdk-lib/aws-logs'
 import { ARecord, PublicHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53'
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets'
+import { Bucket } from 'aws-cdk-lib/aws-s3'
 import { Construct } from 'constructs'
 
 export interface ActionsStackProps extends StackProps {
   domain: string;
   cname: string;
+  assetCname: string;
   certificateArn: string;
   solanaRpcNode: string;
+  bucket: Bucket;
 }
 
 export class ActionsStack extends Stack {
@@ -39,6 +42,8 @@ export class ActionsStack extends Stack {
       domain,
       cname,
       solanaRpcNode,
+      bucket,
+      assetCname,
     } = props
 
     const domainName = `${cname}.${domain}`
@@ -52,16 +57,18 @@ export class ActionsStack extends Stack {
 
     const lambda = new NodejsFunction(this, 'ActionsHandler', {
       runtime: Runtime.NODEJS_20_X,
-      timeout: Duration.seconds(5),
+      timeout: Duration.seconds(6),
       architecture: Architecture.ARM_64,
       description: `Handler function for the ${id} actions`,
-      memorySize: 256,
+      memorySize: 512,
       functionName: `${id}Actions`,
       entry: path.join(__dirname, '../lambda/actions.ts'),
       logRetention: RetentionDays.TWO_WEEKS,
       environment: {
         TABLE_NAME: table.tableName,
         SOLANA_RPC_NODE: solanaRpcNode,
+        BUCKET_NAME: bucket.bucketName,
+        DOMAIN: `${assetCname}.${domain}`,
       },
       handler: 'handler',
       bundling: {
@@ -70,6 +77,7 @@ export class ActionsStack extends Stack {
       },
     })
     table.grantReadWriteData(lambda)
+    bucket.grantReadWrite(lambda)
 
     const api = new HttpApi(this, 'HttpApi', {
       corsPreflight: {

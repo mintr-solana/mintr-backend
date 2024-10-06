@@ -86,11 +86,19 @@
       "type": "runtime"
     },
     {
+      "name": "@aws-sdk/client-s3",
+      "type": "runtime"
+    },
+    {
       "name": "@aws-sdk/util-dynamodb",
       "type": "runtime"
     },
     {
       "name": "@metaplex-foundation/mpl-core",
+      "type": "runtime"
+    },
+    {
+      "name": "@metaplex-foundation/mpl-token-metadata",
       "type": "runtime"
     },
     {
