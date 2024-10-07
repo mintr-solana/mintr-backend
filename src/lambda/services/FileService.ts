@@ -22,22 +22,28 @@ export class FileService {
   /**
    * Store file and save public available url
    *
+   * @param account account of the client
    * @param filename key of the new file
    * @param contentJson content of the file
+   * @param addDateInKey if the key should contain the current date
    */
-  saveJsonFile = async ({ filename, contentJson }: SaveFileRequest): Promise<string> => {
+  saveJsonFile = async ({ account, filename, contentJson, addDateInKey = false }: SaveFileRequest): Promise<string> => {
+    const today = new Date()
+    const directory = addDateInKey ?
+      `${account}/${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}` :
+      account
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
-      Key: filename,
+      Key: `${directory}/${filename}`,
       Body: JSON.stringify(contentJson),
       ContentType: 'application/json',
     })
     await this.s3Client.send(command)
-    const url = `${this.domain}/${filename}`
+    const url = `https://${this.domain}/${directory}/${encodeURIComponent(filename)}`
     this.logger.info(`Saved file ${filename} to S3`, {
       content: contentJson,
       url,
     })
-    return `https://${url}`
+    return url
   }
 }

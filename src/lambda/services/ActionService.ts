@@ -76,15 +76,16 @@ export class ActionService {
       umi.use(signerPayer(payer))
       umi.use(mplTokenMetadata())
 
-      const today = new Date()
       const assetInfo = {
         name,
         description: name,
         image: request.url,
       }
       const assetInfoUrl = await this.fileService.saveJsonFile({
-        filename: `${request.account}/${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}/${encodeURIComponent(name)}.json`,
+        account: request.account,
+        filename: `${name}.json`,
         contentJson: assetInfo,
+        addDateInKey: true,
       })
 
       const asset = createNft(umi, {
