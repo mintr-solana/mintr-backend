@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { Logger } from '@aws-lambda-powertools/logger'
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { getMandatoryEnv } from '../../utils/getMandatoryEnv'
@@ -28,18 +29,20 @@ export class FileService {
    * @param addDateInKey if the key should contain the current date
    */
   saveJsonFile = async ({ account, filename, contentJson, addDateInKey = false }: SaveFileRequest): Promise<string> => {
+    const uuid = randomUUID()
     const today = new Date()
     const directory = addDateInKey ?
       `${account}/${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}` :
       account
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
-      Key: `${directory}/${filename}`,
+      Key: `${directory}/${uuid}.json`,
       Body: JSON.stringify(contentJson),
       ContentType: 'application/json',
+      Metadata: { name: filename },
     })
     await this.s3Client.send(command)
-    const url = `https://${this.domain}/${directory}/${encodeURIComponent(filename)}`
+    const url = `https://${this.domain}/${directory}/${uuid}.json`
     this.logger.info(`Saved file ${filename} to S3`, {
       content: contentJson,
       url,

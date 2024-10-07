@@ -55,6 +55,7 @@ export class CloudfrontServedS3Bucket {
           id: 'AbortIncompleteMultipartUploadAfter',
         },
       ],
+      websiteIndexDocument: 'index.html',
       cors: [
         {
           allowedMethods: [HttpMethods.GET, HttpMethods.HEAD],
@@ -69,6 +70,7 @@ export class CloudfrontServedS3Bucket {
       priceClass: PriceClass.PRICE_CLASS_100,
       comment: `${id} Distribution`,
       httpVersion: HttpVersion.HTTP2_AND_3,
+      defaultRootObject: 'index.html',
       defaultBehavior: {
         origin: S3BucketOrigin.withOriginAccessIdentity(this.bucket),
         compress: true,
@@ -83,6 +85,18 @@ export class CloudfrontServedS3Bucket {
         viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         originRequestPolicy: OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
       },
+      errorResponses: [
+        {
+          httpStatus: 403,
+          responseHttpStatus: 200,
+          responsePagePath: '/index.html',
+        },
+        {
+          httpStatus: 404,
+          responseHttpStatus: 200,
+          responsePagePath: '/index.html',
+        },
+      ],
       domainNames: [domainName],
       certificate,
     })
@@ -95,7 +109,7 @@ export class CloudfrontServedS3Bucket {
     })
 
     if (createDeploymentUser) {
-      const user = new User(scope, 'DeploymentUser')
+      const user = new User(scope, `${id}DeploymentUser`)
       const accessKey = new AccessKey(scope, 'AccessKey', { user })
       this.bucket.grantReadWrite(user)
       this.distribution.grantCreateInvalidation(user)
@@ -108,6 +122,16 @@ export class CloudfrontServedS3Bucket {
         value: accessKey.secretAccessKey.unsafeUnwrap(),
       })
     }
+
+    new CfnOutput(scope, 'BucketName', {
+      exportName: `${id}:Bucket:Name`,
+      value: this.bucket.bucketName,
+    })
+
+    new CfnOutput(scope, 'DistributionId', {
+      exportName: `${id}:Distribution:Id`,
+      value: this.distribution.distributionId,
+    })
 
     new CfnOutput(scope, 'Url', {
       exportName: `${id}:Url`,

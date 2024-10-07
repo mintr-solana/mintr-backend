@@ -20,7 +20,7 @@ export class AssetStack extends Stack {
 
     const certificate = Certificate.fromCertificateArn(this, 'Certificate', certificateArn)
 
-    const { bucket } = new CloudfrontServedS3Bucket(this, 'CloudfrontServedS3Bucket', {
+    const { bucket } = new CloudfrontServedS3Bucket(this, 'Assets', {
       domain,
       cname,
       certificate,

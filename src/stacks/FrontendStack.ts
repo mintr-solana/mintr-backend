@@ -16,10 +16,11 @@ export class FrontendStack extends Stack {
 
     const certificate = Certificate.fromCertificateArn(this, 'Certificate', certificateArn)
 
-    new CloudfrontServedS3Bucket(this, 'CloudfrontServedS3Bucket', {
+    new CloudfrontServedS3Bucket(this, 'Frontend', {
       domain,
       certificate,
-      bucketName: 'mintr.assets',
+      bucketName: 'mintr.frontend',
+      createDeploymentUser: true,
     })
   }
 }

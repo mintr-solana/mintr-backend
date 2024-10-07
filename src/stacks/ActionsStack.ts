@@ -60,7 +60,7 @@ export class ActionsStack extends Stack {
       timeout: Duration.seconds(6),
       architecture: Architecture.ARM_64,
       description: `Handler function for the ${id} actions`,
-      memorySize: 512,
+      memorySize: 1024,
       functionName: `${id}Actions`,
       entry: path.join(__dirname, '../lambda/actions.ts'),
       logRetention: RetentionDays.TWO_WEEKS,
