@@ -11,6 +11,7 @@ import {
   ViewerProtocolPolicy,
 } from 'aws-cdk-lib/aws-cloudfront'
 import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins'
+import { AccessKey, User } from 'aws-cdk-lib/aws-iam'
 import { ARecord, PublicHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53'
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets'
 import { BlockPublicAccess, Bucket, BucketEncryption, HttpMethods } from 'aws-cdk-lib/aws-s3'
@@ -19,8 +20,9 @@ import { Construct } from 'constructs'
 export interface CloudfrontServedS3BucketProps {
   certificate: ICertificate;
   domain: string;
-  cname: string;
+  cname?: string;
   bucketName?: string;
+  createDeploymentUser?: boolean;
 }
 
 export class CloudfrontServedS3Bucket {
@@ -33,9 +35,10 @@ export class CloudfrontServedS3Bucket {
       certificate,
       cname,
       bucketName,
+      createDeploymentUser = false,
     } = props
 
-    const domainName = `${cname}.${domain}`
+    const domainName = cname ? `${cname}.${domain}` : domain
     const zone = PublicHostedZone.fromLookup(scope, 'Zone', {
       domainName: domain,
     })
@@ -86,10 +89,25 @@ export class CloudfrontServedS3Bucket {
 
     const record = new ARecord(scope, 'ARecord', {
       zone,
-      recordName: cname,
+      recordName: cname ? cname : domain,
       target: RecordTarget.fromAlias(new CloudFrontTarget(this.distribution)),
       ttl: Duration.hours(12),
     })
+
+    if (createDeploymentUser) {
+      const user = new User(scope, 'DeploymentUser')
+      const accessKey = new AccessKey(scope, 'AccessKey', { user })
+      this.bucket.grantReadWrite(user)
+      this.distribution.grantCreateInvalidation(user)
+      new CfnOutput(scope, 'DeploymentUserAccessKeyId', {
+        exportName: `${id}:DeploymentUser:AccessKey:Id`,
+        value: accessKey.accessKeyId,
+      })
+      new CfnOutput(scope, 'DeploymentUserSecretKey', {
+        exportName: `${id}:DeploymentUser:AccessKey:Secret`,
+        value: accessKey.secretAccessKey.unsafeUnwrap(),
+      })
+    }
 
     new CfnOutput(scope, 'Url', {
       exportName: `${id}:Url`,

@@ -4,6 +4,7 @@ import { ActionsStack } from './stacks/ActionsStack'
 import { AssetStack } from './stacks/AssetStack'
 import { CertificateStack } from './stacks/CertificateStack'
 import { DatabaseStack } from './stacks/DatabaseStack'
+import { FrontendStack } from './stacks/FrontendStack'
 import { getMandatoryEnv } from './utils/getMandatoryEnv'
 
 configDotenv()
@@ -35,6 +36,13 @@ const certificateStack = new CertificateStack(app, 'CertificateStack', {
     region: 'us-east-1',
   },
   crossRegionReferences: true,
+})
+
+new FrontendStack(app, 'FrontendStack', {
+  domain: config.domain,
+  certificateArn: certificateStack.certificateArn,
+  crossRegionReferences: true,
+  env,
 })
 
 const assetStack = new AssetStack(app, 'AssetStack', {
