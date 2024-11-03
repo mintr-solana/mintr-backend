@@ -36,6 +36,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     '@types/http-errors',
     'dotenv',
   ],
+  depsUpgrade: false,
 })
 project.addScripts({
   deploy: './scripts/deploy.sh',
