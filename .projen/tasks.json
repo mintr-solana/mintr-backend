@@ -155,10 +155,6 @@
         }
       ]
     },
-    "post-upgrade": {
-      "name": "post-upgrade",
-      "description": "Runs after upgrading dependencies"
-    },
     "pre-compile": {
       "name": "pre-compile",
       "description": "Prepare the project for compilation"
@@ -200,30 +196,6 @@
       "steps": [
         {
           "exec": "jest --watch"
-        }
-      ]
-    },
-    "upgrade": {
-      "name": "upgrade",
-      "description": "upgrade dependencies",
-      "env": {
-        "CI": "0"
-      },
-      "steps": [
-        {
-          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/aws-lambda,@types/http-errors,@types/jest,@types/node,dotenv,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,jest,projen,ts-jest,ts-node,typescript,@aws-lambda-powertools/logger,@aws-sdk/client-dynamodb,@aws-sdk/client-s3,@aws-sdk/util-dynamodb,@metaplex-foundation/mpl-core,@metaplex-foundation/mpl-token-metadata,@metaplex-foundation/umi,@metaplex-foundation/umi-bundle-defaults,@metaplex-foundation/umi-web3js-adapters,@middy/core,@middy/error-logger,@middy/http-error-handler,@middy/http-header-normalizer,@middy/http-router,@middy/http-security-headers,@solana/actions,@solana/actions-spec,@solana/web3.js,aws-lambda,http-errors"
-        },
-        {
-          "exec": "npm install"
-        },
-        {
-          "exec": "npm update @types/aws-lambda @types/http-errors @types/jest @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk dotenv esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen ts-jest ts-node typescript @aws-lambda-powertools/logger @aws-sdk/client-dynamodb @aws-sdk/client-s3 @aws-sdk/util-dynamodb @metaplex-foundation/mpl-core @metaplex-foundation/mpl-token-metadata @metaplex-foundation/umi @metaplex-foundation/umi-bundle-defaults @metaplex-foundation/umi-web3js-adapters @middy/core @middy/error-logger @middy/http-error-handler @middy/http-header-normalizer @middy/http-router @middy/http-security-headers @solana/actions @solana/actions-spec @solana/web3.js aws-cdk-lib aws-lambda constructs http-errors"
-        },
-        {
-          "exec": "npx projen"
-        },
-        {
-          "spawn": "post-upgrade"
         }
       ]
     },
